@@ -48,6 +48,7 @@ module "ASG" {
   the_subnet                = values(module.vpc.private_subnet)
   environment               = "dev"
 }
+# distribute traffic
 module "ALB" {
   source                = "../../modules/ALB"
   name                  = "my-ALB-aws"
@@ -59,6 +60,7 @@ module "ALB" {
   environment           = "dev"
 
 }
+#the iam
 module "IAM" {
   source          = "../../modules/IAM"
   role_name       = "ec2_access"
