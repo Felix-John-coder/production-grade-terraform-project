@@ -82,7 +82,7 @@ jobs:
         id: plantf
         run: | 
           cd $GITHUB_WORKSPACE/environment/development
-          terraform workspace select ${GITHUB_REF_NAME:-default} || terraform workspace new ${GITHHUB_REF_NAME:-default}
+          terraform workspace select -or-create $ENVIRONMENT
           terraform plan -input=false -out=tfplan -lock=true -no-color
           terraform show -json tfplan > plan.json 
       - name: upload artifacts 
