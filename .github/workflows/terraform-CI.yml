@@ -1,0 +1,96 @@
+name : terraform_ci 
+on:
+  push:
+    branches:
+      - main 
+  pull_request:
+    types: [opened,synchronize,reopened, edited]
+    branches:
+      - main 
+      - prod 
+      - staging 
+  workflow_dispatch:
+permissions:
+  id-token: write 
+  contents: read 
+concurrency:
+  group: $ci-terraform-{{github.ref}}
+  cancel-in-progress: true 
+jobs:
+  CI: 
+    runs-on: ubuntu-latest 
+    timeout-minutes: 5 
+    steps:
+      - name:  checkout code 
+        uses: actions/checkout@v4 
+        with:
+          fetch-depth: 0
+      - name: setup terraform 
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7 
+      - name: setup python for checkov 
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: login to aws 
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{secrets.ROLE}}
+          aws-region: ${{secrets.REGION}}
+      - name: cache terraform plugins and modules 
+        uses: actions/cache@v4
+        with: 
+          path: ./terraform-cache
+          key: -terraform-${{github.sha}}
+          restore-keys: -terraform-
+      
+      - name: terraform init 
+        run: | 
+          cd first_terrform/environment/${{github.ref_name || 'development'}}
+          terraform init -input=false -upgrade 
+      - name: terraform format 
+        run: | 
+          cd first_terrform/environment/${{github.ref_name || 'development'}}
+          terraform fmt -check -recursive 
+      - name: terraform validate 
+        run: | 
+          cd first_terrform/environment/${{github.ref_name || 'development'}}
+          terraform validate -no-color 
+      - name: terraform lint 
+        if: ${{always()}}
+        run: | 
+          pip install tflint 
+          cd first_terrform/environment/${{github.ref_name || 'development'}}
+          tflint --config .tflint.hcl || true 
+      - name: terraform security scan 
+        run: | 
+          curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
+          cd first_terrform/environment/${{github.ref_name || 'development'}}
+          tfsec --format=json --out tfsec-report.json || true 
+      - name: terraform checkov 
+        run: | 
+          pip install checkov 
+          cd first_terrform/environment/${{github.ref_name || 'development'}}
+          checkov -d . -o json --quiet > checkov-report.json || true 
+      - name: terraform plan
+        id: plantf
+        run: | 
+          cd first_terrform/environment/${{github.ref_name || 'development'}}
+          terraform workspace select ${GITHUB_REF_NAME:-default} || terraform workspace new ${GITHHUB_REF_NAME:-default}
+          terraform plan -input=false -out=tfplan -lock=true -no-color
+          terraform show -json tfplan > plan.json 
+      - name: upload artifacts 
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-upload-${{github.sha}}
+          path: |
+            first_terrform/environment/${{github.ref_name || 'development'}}/plan.json
+            first_terrform/environment/${{github.ref_name || 'development'}}/checkov-report.json
+            first_terrform/environment/${{github.ref_name || 'development'}}/tfsec-report.json
+            first_terrform/environment/${{github.ref_name || 'development'}}/tfplan
+      - name: post plan summary on comment 
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: first_terrform/environment/${{github.ref_name || 'development'}}/plan.json
+          header: "terraform plan (automatic CI)- summary"
