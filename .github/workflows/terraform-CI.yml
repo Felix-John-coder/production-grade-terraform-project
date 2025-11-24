@@ -66,8 +66,9 @@ jobs:
       - name: terraform security scan install
         shell: bash
         run: | 
-          set +u
-          curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
+          curl -L https://github.com/aquasecurity/tfsec/releases/latest/download/tfsec-linux-amd64 -o tfsec
+          chmod +x tfsec
+          sudo mv tfsec /usr/local/bin/
       - name: run security scan 
         run: |
           cd $GITHUB_WORKSPACE/environment/development
