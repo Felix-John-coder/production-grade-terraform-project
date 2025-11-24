@@ -47,36 +47,36 @@ jobs:
       
       - name: terraform init 
         run: | 
-          cd production-grade-terraform-project/environment/development
+          cd $GITHUB_WORKSPACE/environment/development
           terraform init -input=false -upgrade 
       - name: terraform format 
         run: | 
-          cd production-grade-terraform-project/environment/development
+          cd $GITHUB_WORKSPACE/environment/development
           terraform fmt -check -recursive 
       - name: terraform validate 
         run: | 
-          cd production-grade-terraform-project/environment/development
+          cd $GITHUB_WORKSPACE/environment/development
           terraform validate -no-color 
       - name: terraform lint 
         if: ${{always()}}
         run: | 
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-          cd production-grade-terraform-project/environment/development
+          cd $GITHUB_WORKSPACE/environment/development
           tflint --config .tflint.hcl || true 
       - name: terraform security scan 
         run: | 
           curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
-          cd production-grade-terraform-project/environment/development
+          cd $GITHUB_WORKSPACE/environment/development
           tfsec --format=json --out tfsec-report.json || true 
       - name: terraform checkov 
         run: | 
           pip install checkov 
-          cd production-grade-terraform-project/environment/development
+          cd $GITHUB_WORKSPACE/environment/development
           checkov -d . -o json --quiet > checkov-report.json || true 
       - name: terraform plan
         id: plantf
         run: | 
-          cd production-grade-terraform-project/environment/development
+          cd $GITHUB_WORKSPACE/environment/development
           terraform workspace select ${GITHUB_REF_NAME:-default} || terraform workspace new ${GITHHUB_REF_NAME:-default}
           terraform plan -input=false -out=tfplan -lock=true -no-color
           terraform show -json tfplan > plan.json 
@@ -85,12 +85,12 @@ jobs:
         with:
           name: terraform-upload-${{github.sha}}
           path: |
-            cd production-grade-terraform-project/environment/development/plan.json
-            cd production-grade-terraform-project/environment/development/checkov-report.json
-            cd production-grade-terraform-project/environment/development/tfsec-report.json
-            cd production-grade-terraform-project/environment/development/tfplan
+            cd $GITHUB_WORKSPACE/environment/development/plan.json
+            cd $GITHUB_WORKSPACE/environment/development/checkov-report.json
+            cd $GITHUB_WORKSPACE/environment/development/tfsec-report.json
+            cd $GITHUB_WORKSPACE/environment/development/tfplan
       - name: post plan summary on comment 
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          path: cd production-grade-terraform-project/environment/development/plan.json
+          path: cd $GITHUB_WORKSPACE/environment/development/plan.json
           header: "terraform plan (automatic CI)- summary"
