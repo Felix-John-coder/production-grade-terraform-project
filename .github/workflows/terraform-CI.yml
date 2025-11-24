@@ -83,7 +83,7 @@ jobs:
       - name: upload artifacts 
         uses: actions/upload-artifact@v4
         with:
-          name: terraform-upload-${{github.sha}}
+          name: terraform_upload${{github.sha}}
           path: |
             cd $GITHUB_WORKSPACE/environment/development/plan.json
             cd $GITHUB_WORKSPACE/environment/development/checkov-report.json

@@ -44,7 +44,7 @@ module "ASG" {
   desire                    = 2
   vpc                       = module.vpc.vpc_id
   alb_enter                 = module.ALB.the_sg_alb
-  baston_login              = [for s in module.baston_ec2: s.sg_bast]
+  baston_login              = [for s in module.baston_ec2 : s.sg_bast]
   the_subnet                = values(module.vpc.private_subnet)
   environment               = "dev"
 }
