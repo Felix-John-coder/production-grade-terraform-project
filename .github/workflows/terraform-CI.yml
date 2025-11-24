@@ -47,36 +47,36 @@ jobs:
       
       - name: terraform init 
         run: | 
-          cd production-grade-terraform-project/environment/development/
+          cd production-grade-terraform-project/environment/development
           terraform init -input=false -upgrade 
       - name: terraform format 
         run: | 
-          cd production-grade-terraform-project/environment/development/
+          cd production-grade-terraform-project/environment/development
           terraform fmt -check -recursive 
       - name: terraform validate 
         run: | 
-          cd production-grade-terraform-project/environment/development/
+          cd production-grade-terraform-project/environment/development
           terraform validate -no-color 
       - name: terraform lint 
         if: ${{always()}}
         run: | 
           pip install tflint 
-          cd production-grade-terraform-project/environment/development/
+          cd production-grade-terraform-project/environment/development
           tflint --config .tflint.hcl || true 
       - name: terraform security scan 
         run: | 
           curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
-          cd production-grade-terraform-project/environment/development/
+          cd production-grade-terraform-project/environment/development
           tfsec --format=json --out tfsec-report.json || true 
       - name: terraform checkov 
         run: | 
           pip install checkov 
-          cd production-grade-terraform-project/environment/development/
+          cd production-grade-terraform-project/environment/development
           checkov -d . -o json --quiet > checkov-report.json || true 
       - name: terraform plan
         id: plantf
         run: | 
-          cd production-grade-terraform-project/environment/development/
+          cd production-grade-terraform-project/environment/development
           terraform workspace select ${GITHUB_REF_NAME:-default} || terraform workspace new ${GITHHUB_REF_NAME:-default}
           terraform plan -input=false -out=tfplan -lock=true -no-color
           terraform show -json tfplan > plan.json 
