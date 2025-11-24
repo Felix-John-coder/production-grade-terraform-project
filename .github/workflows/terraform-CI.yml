@@ -65,6 +65,7 @@ jobs:
           tflint --config .tflint.hcl || true 
       - name: terraform security scan 
         run: | 
+          set +u
           curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
           cd $GITHUB_WORKSPACE/environment/development
           tfsec --format=json --out tfsec-report.json || true 
