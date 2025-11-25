@@ -6,7 +6,7 @@ on:
       - staging 
       - prod 
   pull_request:
-    types: [edited, synchronize, reopened]
+    types: [edited, synchronize, reopened, opened]
     branches:
       - dev 
       - staging 
