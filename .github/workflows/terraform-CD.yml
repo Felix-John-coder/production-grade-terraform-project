@@ -80,7 +80,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/environment/development 
           Environment="${{github.ref_name}}"
-          terraform workspace select $Environment || workspace new $Environment
+          terraform workspace select -or-create $Environment
           terraform plan -input=false -out=tfplan 
           terraform show -json tfplan > tfplan.json
       - name: upload the file 
