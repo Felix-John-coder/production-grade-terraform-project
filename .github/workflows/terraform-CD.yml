@@ -3,6 +3,7 @@ on:
   workflow_run:
     workflows: ['terraform_plan']
     types: ['completed']
+    branches: [ "dev" ]
   workflow_dispatch: 
 
 concurrency:

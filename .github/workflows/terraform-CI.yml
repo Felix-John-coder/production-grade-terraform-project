@@ -1,16 +1,16 @@
 name: terraform_plan
 on:
   push:
-    branches:
-      - dev 
-      - staging 
-      - prod 
+    branches: [dev]
+     # - dev 
+     # - staging 
+     # - prod 
   pull_request:
     types: [edited, synchronize, reopened, opened]
-    branches:
-      - dev 
-      - staging 
-      - prod
+    branches: [dev]
+     # - dev 
+      #- staging 
+      #- prod
   workflow_dispatch:
 permissions:
   id-token: write
