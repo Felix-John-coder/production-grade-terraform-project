@@ -8,7 +8,7 @@ on:
       - prod
     types: ['completed']
   workflow_dispatch: 
-  
+
 concurrency:
  group: terraform-cd${{github.ref}}
  cancel-in-progress: true 
@@ -20,7 +20,7 @@ jobs:
   apply: 
     runs-on: ubuntu-latest
     if: ${{github.event.workflow_run.conclusion == 'success'}}
-    environment: development 
+    #environment: development 
     timeout-minutes: 2
     steps:
       - name: checkout repo for terraform apply 
