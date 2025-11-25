@@ -1,4 +1,4 @@
-name: CI 
+name: terraform_plan
 on:
   push:
     branches:

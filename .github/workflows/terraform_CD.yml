@@ -1,11 +1,7 @@
 name: terraform apply 
 on:
   workflow_run:
-    workflows: ["CI"]
-    branches: 
-      - dev
-      - staging
-      - prod
+    workflows: ["terraform_plan"]
     types: ['completed']
   workflow_dispatch: 
 
