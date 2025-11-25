@@ -2,7 +2,7 @@ name: plan
 on:
   push:
     branches:
-      - main 
+      - dev 
       - staging 
       - prod 
   pull_request:
