@@ -72,9 +72,9 @@ jobs:
       - name: terraform plan
         run: | 
           cd $GITHUB_WORKSPACE/environment/development 
-          $ENVIRONMENT="${$GITHUB_WORKSPACE/environment/development || 'development'}"
-          terraform workspace select -or-create=true $ENVIRONMENT
-          terraform plan -input=false -out=tfplan 
+          ENVIRONMENT="${{github.ref_name}}"
+          terraform workspace select -or-create $ENVIRONMENT
+          terraform plan -input=false -out=tfplan
           terraform show -json tfplan > plan.json
       - name: upload documents 
         uses: actions/upload-artifact@v4 
