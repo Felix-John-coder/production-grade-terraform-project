@@ -64,7 +64,7 @@ jobs:
           tflint --format=json  -out tflint.json || true 
       - name: terraform tfsec 
         run: | 
-          curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash -o tfsec
+          curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh  -o tfsec
           chmod +x tfsec
           sudo mv tfsec /usr/local/bin
       - name: run security 
