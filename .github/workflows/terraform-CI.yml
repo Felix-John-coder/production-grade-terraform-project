@@ -61,10 +61,10 @@ jobs:
       - name: terraform linting 
         run: | 
           curl -ls https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-          tflint --format=json  -out .tflint.hcl > tflint.json || true 
+          tflint --format=json  -out tflint.json || true 
       - name: terraform tfsec 
         run: | 
-          curl -l   https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh -o tfsecurity
+          curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash -o tfsecurity
           chmod +x tfsecurity 
           sudo mv tfsecurity /usr/local/bin
       - name: run security 

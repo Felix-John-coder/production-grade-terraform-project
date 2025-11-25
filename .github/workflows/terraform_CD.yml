@@ -2,15 +2,20 @@ name: terraform apply
 on:
   workflow_run:
     workflows: ["CI"]
-    types:
-      - completed
+    branches: 
+      - dev
+      - staging
+      - prod
+    types: ['completed']
   workflow_dispatch: 
+  
 concurrency:
  group: terraform-cd${{github.ref}}
  cancel-in-progress: true 
 permissions:
   id-token: write
   contents: read 
+
 jobs:
   apply: 
     runs-on: ubuntu-latest
