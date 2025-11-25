@@ -14,6 +14,8 @@ permissions:
 jobs:
   apply: 
     runs-on: ubuntu-latest
+    if: ${{github.event.workflow_run.conclusion == 'success'}}
+    environment: development 
     timeout-minutes: 2
     steps:
       - name: checkout repo for terraform apply 
@@ -34,5 +36,24 @@ jobs:
         with:
           path: ./
           name: terraform_file
-        
-      
+      - name: check downloaded file 
+        run: ls -la terraform_file
+      - name: terraform init for apply
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform init -no-color -input=false -upgrade
+      - name: switch to workspace
+        run: | 
+          cd $GITHUB_WORKSPACE/environment/development
+          environment="${{github.ref_name}}"
+          terraform workspace select -or-create $environment
+      - name: terraform apply 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform apply --auto-approve -input=false tfplan
+
+      - name: finished work 
+        run: echo "apply done for ${{github.event.workflow_run.head_branch}}"
+      - name: if failed 
+        if: ${{failure()}}
+        run: terraform destroy --auto-approve
