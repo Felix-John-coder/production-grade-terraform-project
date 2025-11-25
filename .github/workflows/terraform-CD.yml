@@ -46,11 +46,11 @@ jobs:
       - name: terraform fmt 
         run: | 
           cd $GITHUB_WORKSPACE/environment/development
-          terraform fmt -input=false -recursive 
+          terraform fmt -recursive 
       - name: terraform validate 
         run: |
           cd $GITHUB_WORKSPACE/environment/development
-          terraform validate -input=false -no-color 
+          terraform validate -check -input=false -no-color 
       - name: terraform linting 
         run: | 
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
