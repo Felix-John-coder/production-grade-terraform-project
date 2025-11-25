@@ -2,7 +2,7 @@ name: terraform apply
 on:
   workflow_run:
     workflows: ['terraform_plan']
-    types: [completed]
+    types: ['completed']
   workflow_dispatch: 
 
 concurrency:
