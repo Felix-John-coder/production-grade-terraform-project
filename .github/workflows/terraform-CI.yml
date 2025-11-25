@@ -88,11 +88,11 @@ jobs:
         with: 
           name: terraform_file
           path: |
-            $GITHUB_WORKSPACE/environment/development/tfplan 
-            $GITHUB_WORKSPACE/environment/development/tfplan.json 
-            $GITHUB_WORKSPACE/environment/development/check-report.json 
-            $GITHUB_WORKSPACE/environment/development/tfsec.json
-            $GITHUB_WORKSPACE/environment/development/tflint.json 
+            environment/development/tfplan 
+            environment/development/tfplan.json 
+            environment/development/check-report.json 
+            environment/development/tfsec.json
+            environment/development/tflint.json 
       - name: pull_request comment 
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
