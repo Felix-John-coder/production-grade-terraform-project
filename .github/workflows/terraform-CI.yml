@@ -2,7 +2,7 @@ name: terraform_plan
 on:
   push:
     branches:
-      - dev 
+      - main 
       - staging 
       - prod 
   pull_request:
