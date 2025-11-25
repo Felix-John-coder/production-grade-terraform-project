@@ -1,0 +1,88 @@
+name: CI workflow 
+on: 
+  push: 
+    branches:
+      - main 
+      - dev 
+  pull_request:
+    types: [opened, edited, ]
+    branches:
+      - main 
+      - dev
+  workflow_dispatch:
+permissions:
+  id-token: write 
+  contents: write 
+concurrency:
+  group: terraform-ci-${{github.ref}}
+  cancel-in-progress: true 
+jobs:
+  terraform: 
+    runs-on: ubuntu-latest 
+    timeout-minutes: 5
+    if: ${{github.ref}} == /refs/head/main
+    steps:
+      - name: checkout the repo 
+        uses: actions/checkout@v4
+        with: 
+          fetch-depth: 0 
+      - name: setup python 
+        uses: actions/setup-python@v2
+        with: 
+          python-version: 3.11 
+          cache: ./python 
+      - name: setup terraform 
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{secrets.ROLE}}
+          aws-region: ${{secrets.REGION}}
+      - name: terraform init 
+        run: | 
+          cd $GITHUB_WORKSPACE/environment/development 
+          terraform init -no-color
+      - name: terraform fmt 
+        run: | 
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform fmt -input=false -recursive 
+      - name: terraform validate 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform validate -input=false -no-color 
+      - name: terraform linting 
+        run: | 
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          cd $GITHUB_WORKSPACE/environment/development
+          tflint --config .tflint.hcl || true 
+      - name: terraform checkov 
+        run: | 
+          pip install checkov 
+          cd $GITHUB_WORKSPACE/environment/development
+          checkov -d .  -o json --quiet > checkov-report.json || true 
+      - name: terraform security scan tfsec
+        run: | 
+          curl -s https://github.com/aquasecurity/tfsec/releases/latest/download/tfsec-linux-amd64 -o tfsec
+          chmod +x tfsec
+          sudo mv tfsec /usr/local/bin/
+      - name: run security check now 
+        run: | 
+          tfsec --format=json --out tfsec.json || true 
+      - name: terraform plan
+        run: | 
+          cd $GITHUB_WORKSPACE/environment/development 
+          terraform workspace select -or-create $ENVIRONMENT 
+          terraform plan -input=false -out=tfplan 
+          terraform show -json tfplan > plan.json
+      - name: upload documents 
+        uses: actions/upload-artifact@v4 
+        with:
+          path: |
+            $GITHUB_WORKSPACE/environment/development/checkov-report.json
+            $GITHUB_WORKSPACE/environment/development/plan.json 
+            $GITHUB_WORKSPACE/environment/development/tfsec.json 
+            $GITHUB_WORKSPACE/environment/development/tfplan
+          name: terraform_plan 
+      - name:  pull_request comment 
+        uses: marocchino/sticky-pull-request-comment@v2
+        with: 
+          path: cd $GITHUB_WORKSPACE/environment/development/plan.json
+          header: "terraform plan (automatic - CI )-summary"
