@@ -73,7 +73,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/environment/development
           tfsec --format=json --out tfsec-report.json || true 
-      - name: terraform checkov 
+      - name: terraform checkov for security
         run: | 
           pip install checkov 
           cd $GITHUB_WORKSPACE/environment/development
@@ -95,6 +95,7 @@ jobs:
             cd $GITHUB_WORKSPACE/environment/development/checkov-report.json
             cd $GITHUB_WORKSPACE/environment/development/tfsec-report.json
             cd $GITHUB_WORKSPACE/environment/development/tfplan
+    
       - name: post plan summary on comment 
         uses: marocchino/sticky-pull-request-comment@v2
         with:
