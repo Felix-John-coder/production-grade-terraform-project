@@ -57,7 +57,7 @@ jobs:
         run: | 
           cd $GITHUB_WORKSPACE/environment/development
           terraform validate -no-color 
-      - name: terraform lint 
+      - name: terraform lint the code
         if: ${{always()}}
         run: | 
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
