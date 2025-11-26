@@ -39,10 +39,6 @@ jobs:
           aws s3 cp s3://bucket-store-felix-aws/tfplan.json $GITHUB_WORKSPACE/environment/development
       - name: check downloaded file 
         run: ls -la .
-      - name: terraform init for apply
-        run: |
-          cd $GITHUB_WORKSPACE/environment/development
-          terraform init -no-color -input=false -upgrade
       - name: switch to workspace
         run: | 
           cd $GITHUB_WORKSPACE/environment/development
