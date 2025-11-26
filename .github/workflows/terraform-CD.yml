@@ -51,7 +51,7 @@ jobs:
       - name: terraform apply 
         run: |
           cd $GITHUB_WORKSPACE/environment/development
-          terraform apply --auto-approve -input=false .tfplan
+          terraform apply --auto-approve -input=false tfplan
 
       - name: finished  
         run: echo "apply done for ${{github.event.workflow_run.head_branch}}"
