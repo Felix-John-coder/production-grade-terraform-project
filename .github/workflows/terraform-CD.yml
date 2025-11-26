@@ -42,7 +42,6 @@ jobs:
           aws s3 cp s3://bucket-store-felix-aws/check-report.json .
           aws s3 cp s3://bucket-store-felix-aws/tfplan .
           aws s3 cp s3://bucket-store-felix-aws/tfplan.json .
-          aws s3 cp s3://bucket-store-felix-aws/tflint.json .
       - name: check downloaded file 
         run: ls -la .
       - name: terraform init for apply
