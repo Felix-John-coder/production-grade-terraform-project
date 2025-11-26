@@ -32,11 +32,6 @@ jobs:
         with:
           role-to-assume: ${{secrets.ROLE}}
           aws-region: ${{secrets.REGION}}
-      - name: download artifact 
-        uses: actions/download-artifact@v4
-        with:
-          path: ./
-          name: terraform_file
       - name: download from s3 
         run: |
           aws s3 cp s3://bucket-store-felix-aws/check-report.json .
