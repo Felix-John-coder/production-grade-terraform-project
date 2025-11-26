@@ -37,13 +37,10 @@ jobs:
           aws s3 cp s3://bucket-store-felix-aws/check-report.json $GITHUB_WORKSPACE/environment/development
           aws s3 cp s3://bucket-store-felix-aws/tfplan $GITHUB_WORKSPACE/environment/development
           aws s3 cp s3://bucket-store-felix-aws/tfplan.json $GITHUB_WORKSPACE/environment/development
+          aws s3 cp s3://bucket-store-felix-aws/.terraform/ $GITHUB_WORKSPACE/environment/development
+          aws s3 cp s3://bucket-store-felix-aws/.terraform.lock.hcl $GITHUB_WORKSPACE/environment/development
       - name: check downloaded file 
         run: ls -la .
-      - name: switch to workspace
-        run: | 
-          cd $GITHUB_WORKSPACE/environment/development
-          environment="${{github.ref_name}}"
-          terraform workspace select -or-create $environment
       - name: terraform apply 
         run: |
           cd $GITHUB_WORKSPACE/environment/development

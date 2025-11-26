@@ -83,11 +83,17 @@ jobs:
           terraform workspace select -or-create $Environment
           terraform plan -input=false -out=tfplan 
           terraform show -json tfplan > tfplan.json
+      - name: check file 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development 
+          ls -la
       - name: upload to s3 bucket 
         run: |
           aws s3 cp $GITHUB_WORKSPACE/environment/development/check-report.json s3://bucket-store-felix-aws
           aws s3 cp $GITHUB_WORKSPACE/environment/development/tfplan s3://bucket-store-felix-aws 
           aws s3 cp $GITHUB_WORKSPACE/environment/development/tfplan.json  s3://bucket-store-felix-aws 
+          aws s3 cp $GITHUB_WORKSPACE/environment/development/.terraform/ s3://bucket-store-felix-aws
+          aws s3 cp $GITHUB_WORKSPACE/environment/development/.terraform.lock.hcl s3://bucket-store-felix-aws
    
       - name: pull_request comment 
         if: github.event_name == 'pull_request'
