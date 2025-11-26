@@ -48,7 +48,7 @@ jobs:
           cd $GITHUB_WORKSPACE/environment/development
           environment="${{github.ref_name}}"
           terraform workspace select -or-create $environment
-      - name: run terraform apply 
+      - name: terraform apply 
         run: |
           cd $GITHUB_WORKSPACE/environment/development
           terraform apply --auto-approve -input=false .tfplan
