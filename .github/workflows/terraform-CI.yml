@@ -92,7 +92,7 @@ jobs:
           aws s3 cp $GITHUB_WORKSPACE/environment/development/check-report.json s3://bucket-store-felix-aws
           aws s3 cp $GITHUB_WORKSPACE/environment/development/tfplan s3://bucket-store-felix-aws 
           aws s3 cp $GITHUB_WORKSPACE/environment/development/tfplan.json  s3://bucket-store-felix-aws 
-          aws s3 cp $GITHUB_WORKSPACE/environment/development/.terraform/ s3://bucket-store-felix-aws
+          aws s3 cp $GITHUB_WORKSPACE/environment/development/.terraform s3://bucket-store-felix-aws
           aws s3 cp $GITHUB_WORKSPACE/environment/development/.terraform.lock.hcl s3://bucket-store-felix-aws
    
       - name: pull_request comment 
