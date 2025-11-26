@@ -19,7 +19,7 @@ jobs:
     environment: development 
     timeout-minutes: 3
     steps:
-      - name: checkout repo 
+      - name: checkout repo for source code
         uses: actions/checkout@v4 
         with:
           fetch-depth: 0
