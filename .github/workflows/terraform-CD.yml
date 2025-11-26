@@ -3,6 +3,10 @@ on:
   workflow_run:
     workflows: ['plan']
     types: ['completed']
+    branches: 
+      - dev 
+      - staging
+      - prod
   workflow_dispatch: 
 
 concurrency:
