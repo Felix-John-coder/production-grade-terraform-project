@@ -58,3 +58,6 @@ jobs:
       - name: if failed 
         if: ${{failure()}}
         run: terraform destroy --auto-approve 
+      - name: if success 
+        if: ${{success()}}
+        run: echo "hurray workflow completed!"
