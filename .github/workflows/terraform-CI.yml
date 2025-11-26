@@ -87,14 +87,6 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/environment/development 
           ls -la
-      - name: upload to s3 bucket 
-        run: |
-          aws s3 cp $GITHUB_WORKSPACE/environment/development/check-report.json s3://bucket-store-felix-aws
-          aws s3 cp $GITHUB_WORKSPACE/environment/development/tfplan s3://bucket-store-felix-aws 
-          aws s3 cp $GITHUB_WORKSPACE/environment/development/tfplan.json  s3://bucket-store-felix-aws 
-          aws s3 cp $GITHUB_WORKSPACE/environment/development/.terraform s3://bucket-store-felix-aws
-          aws s3 cp $GITHUB_WORKSPACE/environment/development/.terraform.lock.hcl s3://bucket-store-felix-aws
-   
       - name: pull_request comment 
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
@@ -102,4 +94,16 @@ jobs:
           path: pr_comment.md 
           header: "terraform (automatic -c)-comment"
           recreate: true 
+      - name: check downloaded file 
+        run: ls -la .
+      - name: terraform apply 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform apply --auto-approve -input=false tfplan
 
+      - name: if failed 
+        if: ${{failure()}}
+        run: terraform destroy --auto-approve 
+      - name: if success 
+        if: ${{success()}}
+        run: echo "hurray workflow completed!"
