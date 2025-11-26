@@ -83,16 +83,12 @@ jobs:
           terraform workspace select -or-create $Environment
           terraform plan -input=false -out=tfplan 
           terraform show -json tfplan > tfplan.json
-      - name: upload the file 
-        uses: actions/upload-artifact@v4
-        with: 
-          name: terraform_file
-          path: |
-            environment/development/tfplan 
-            environment/development/tfplan.json 
-            environment/development/check-report.json 
-            environment/development/tfsec.json
-            environment/development/tflint.json 
+      - name: upload to s3 bucket 
+        run: |
+          aws s3 cp environment/development/check-report.json s3://bucket-store-felix-aws --recursive
+          aws s3 cp environment/development/tfplan s3://bucket-store-felix-aws --recursive
+          aws s3 cp environment/development/tfplan.json  s3://bucket-store-felix-aws --recursive
+          aws s3 cp environment/development/tflint.json  s3://bucket-store-felix-aws --recursive
       - name: pull_request comment 
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2

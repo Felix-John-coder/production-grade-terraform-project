@@ -37,8 +37,14 @@ jobs:
         with:
           path: ./
           name: terraform_file
+      - name: download from s3 
+        run: |
+          aws s3 cp s3://bucket-store-felix-aws/check-report.json .
+          aws s3 cp s3://bucket-store-felix-aws/tfplan .
+          aws s3 cp s3://bucket-store-felix-aws/tfplan.json .
+          aws s3 cp s3://bucket-store-felix-aws/tflint.json .
       - name: check downloaded file 
-        run: ls -la terraform_file
+        run: ls -la .
       - name: terraform init for apply
         run: |
           cd $GITHUB_WORKSPACE/environment/development
