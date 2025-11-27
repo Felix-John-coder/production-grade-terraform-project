@@ -100,7 +100,7 @@ jobs:
           cd $GITHUB_WORKSPACE/environment/development
           terraform apply --auto-approve -input=false tfplan
 
-      - name: if failed 
+      - name: if failed destroy anything 
         if: ${{failure()}}
         run: terraform destroy --auto-approve 
       - name: if success destroy 
