@@ -21,6 +21,7 @@ concurrency:
 jobs: 
   plan:
     runs-on: ubuntu-latest 
+    environment: development
     steps:
       - name: checkout repo 
         uses: actions/checkout@v4 
@@ -85,7 +86,7 @@ jobs:
       - name: check file 
         run: |
           cd $GITHUB_WORKSPACE/environment/development 
-          ls -la
+          ls -la 
       - name: pull_request comment 
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
@@ -93,8 +94,6 @@ jobs:
           path: pr_comment.md 
           header: "terraform (automatic -c)-comment"
           recreate: true 
-      - name: check file
-        run: ls -l.
       - name: terraform apply 
         run: |
           cd $GITHUB_WORKSPACE/environment/development
