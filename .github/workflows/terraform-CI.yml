@@ -83,7 +83,7 @@ jobs:
           terraform workspace select -or-create $Environment
           terraform plan -input=false -out=tfplan 
           terraform show -json tfplan > tfplan.json
-      - name: check file 
+      - name: check file let know what is in the runner
         run: |
           cd $GITHUB_WORKSPACE/environment/development 
           ls -la 
