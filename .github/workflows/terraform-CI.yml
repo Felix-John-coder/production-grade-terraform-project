@@ -103,6 +103,6 @@ jobs:
       - name: if failed 
         if: ${{failure()}}
         run: terraform destroy --auto-approve 
-      - name: if success 
+      - name: if success destroy 
         if: ${{success()}}
         run: terraform destroy --auto-approve 
