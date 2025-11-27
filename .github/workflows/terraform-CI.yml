@@ -70,7 +70,7 @@ jobs:
         run: | 
           cd $GITHUB_WORKSPACE/environment/development
           tfsec --format=json --out=tfsec.json || true 
-      - name: run terraform checkov 
+      - name: run terraform checkov
         run: |
           pip install checkov 
           cd $GITHUB_WORKSPACE/environment/development 
@@ -93,8 +93,8 @@ jobs:
           path: pr_comment.md 
           header: "terraform (automatic -c)-comment"
           recreate: true 
-      - name: check downloaded file 
-        run: ls -la .
+      - name: check file
+        run: ls -l.
       - name: terraform apply 
         run: |
           cd $GITHUB_WORKSPACE/environment/development
