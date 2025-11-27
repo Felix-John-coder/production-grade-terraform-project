@@ -1,7 +1,7 @@
 locals {
   private       = { for k, v in module.vpc.private_subnet : k => v }
   public_baston = { for k, v in module.vpc.baston_subnet : k => v }
-  #public        = { for k, v in module.vpc.public_subnet : k => v }
+  public        = { for k, v in module.vpc.public_subnet : k => v }
 }
 
 module "vpc" {
@@ -55,7 +55,7 @@ module "ALB" {
   bucket_name           = module.S3.buck_name
   alb_path_health_check = "/index.html"
   alb_sg_vpc            = module.vpc.vpc_id
-  alb_subnet            = values(local.private)
+  alb_subnet            = values(local.public)
   alb_vpc               = module.vpc.vpc_id
   environment           = "dev"
 
