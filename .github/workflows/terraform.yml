@@ -55,7 +55,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/environment/development
           tfsec ./terraform/ --format json > tfsec.json || true 
-      - name: run checkov 
+      - name: run checkov on terraform
         run: |
           pip install upgrade 
           pip install checkov
