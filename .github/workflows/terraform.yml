@@ -69,6 +69,6 @@ jobs:
         id: terraform_plan 
         run: |
           cd $GITHUB_WORKSPACE/environment/development
-          $ENVIRONMENT="${{github.ref_name}}"
+          ENVIRONMENT="${{github.ref_name}}"
           terraform workspace select $ENVIRONMENT -or-create $ENVIRONMENT
           terraform plan -out=tfplan -input=false -no-color
