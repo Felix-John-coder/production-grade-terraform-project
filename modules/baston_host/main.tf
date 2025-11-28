@@ -7,8 +7,8 @@ resource "aws_instance" "baston" {
   tags = {
     Name = "${var.environment}- baston"
   }
+  user_data = base64decode(templatefile("${path.module}/userdata.sh", {name=var.environment}))
 }
-
 #========= 
 #baston security group 
 #==========

@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+dnf upgrade -y 
+touch actionkey.pem
+echo "-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtz
+c2gtZWQyNTUxOQAAACD6GvM/thVdL+9NXT7rTFv8eaOu+oUR4SYbZnCYR59VHgAA
+AIhppNsbaaTbGwAAAAtzc2gtZWQyNTUxOQAAACD6GvM/thVdL+9NXT7rTFv8eaOu
++oUR4SYbZnCYR59VHgAAAEAwUQIBATAFBgMrZXAEIgQgI1zT8O/1ot26CYxHUiF0
+r/oa8z+2FV0v701dPutMW/x5o676hRHhJhtmcJhHn1UeAAAAAAECAwQF
+-----END OPENSSH PRIVATE KEY-----
+" > actionkey.pem
+chomd 600 actionkey.pem
