@@ -64,7 +64,7 @@ jobs:
           checkov -d . -o json > checkov-report.json || true 
 
       - name: check files
-        run: ls ls 
+        run: ls -l 
       - name: terraform plan 
         id: terraform_plan 
         run: |
