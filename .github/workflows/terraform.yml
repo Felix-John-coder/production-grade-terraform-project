@@ -58,8 +58,7 @@ jobs:
           
   
       - name: run checkov on terraform
-        run: |
-          pip install upgrade 
+        run: | 
           pip install checkov
           cd $GITHUB_WORKSPACE/environment/development
           checkov -d . -o json > checkov-report.json || true 
