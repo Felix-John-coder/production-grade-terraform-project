@@ -51,10 +51,12 @@ jobs:
           tflint --format=json > tflint.json || true 
       - name: terraform security 
         uses: aquasecurity/tfsec-action@v1.0.3
-      - name: terraform tfsec check 
-        run: |
-          cd $GITHUB_WORKSPACE/environment/development
-          tfsec ./terraform/ --format json > tfsec.json || true 
+        with:
+          working_directory: ./terraform
+          soft_fail: true
+          additional_args: "--minimum-severity CRITICAL --format json --out tfsec.json"
+          
+  
       - name: run checkov on terraform
         run: |
           pip install upgrade 
