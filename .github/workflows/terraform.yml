@@ -52,7 +52,7 @@ jobs:
       - name: terraform security 
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
-          working_directory: ./terraform/
+          working_directory: ./environment/development
           soft_fail: true
           additional_args: "--minimum-severity CRITICAL --format json --out tfsec.json"
           
