@@ -1,0 +1,72 @@
+name: terraform plan and apply 
+on: 
+  push:
+    branches: [dev, staging, prod]
+  pull_request: [dev, staging]
+  workflow_dispatch: 
+permissions:
+  id-token: write
+  contents: write
+concurrency: 
+  group: terraform-automate${{github.ref}}
+  cancel-in-progress: true 
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out repo 
+        uses: actions/checkout@v4 
+        with:
+          fetch-depth: 0
+      - name: setup python env 
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: setup terraform env 
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+      - name: login to aws
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{secrets.ROLE}}
+          aws-region: ${{secrets.REGION}}
+      - name: terraform init 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform init -upgrade -input=false 
+      - name: terraform fmt -check -recursive 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform fmt 
+      - name: terraform validate 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform validate -no-color 
+      - name: terraform lint 
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          cd $GITHUB_WORKSPACE/environment/development
+          tflint --format=json > tflint.json || true 
+      - name: terraform security 
+        uses: aquasecurity/tfsec-action@v1.0.3
+      - name: terraform tfsec check 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          tfsec ./terraform/ --format json > tfsec.json || true 
+      - name: run checkov 
+        run: |
+          pip install upgrade 
+          pip install checkov
+          cd $GITHUB_WORKSPACE/environment/development
+          checkov -d . -o json > checkov-report.json || true 
+
+      - name: check files
+        run: ls ls 
+      - name: terraform plan 
+        id: terraform_plan 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          environment = "${{github.ref_name}}"
+          terraform workspace select $environment || -or-create $environment
+          terraform plan -out=tfplan -input=false -no-color
