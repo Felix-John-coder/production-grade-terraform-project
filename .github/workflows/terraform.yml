@@ -2,7 +2,8 @@ name: terraform plan and apply
 on: 
   push:
     branches: [dev, staging, prod]
-  pull_request: [dev, staging]
+  pull_request: 
+    branches: [dev, staging]
   workflow_dispatch: 
 permissions:
   id-token: write
