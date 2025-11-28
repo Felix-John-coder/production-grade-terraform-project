@@ -1,0 +1,102 @@
+name: plan
+on:
+  push:
+    branches:
+      - dev 
+      - staging 
+      - prod 
+  pull_request:
+    types: [edited, synchronize, reopened, opened]
+    branches:
+      - dev 
+      - staging 
+      - prod
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+concurrency:
+  group: terraform-ci${{github.ref}}
+  cancel-in-progress: true 
+jobs: 
+  plan:
+    runs-on: ubuntu-latest 
+    environment: development
+    steps:
+      - name: checkout repo 
+        uses: actions/checkout@v4 
+        with:
+          fetch-depth: 0 
+      - name: setup python 
+        uses: actions/setup-python@v4 
+        with:
+          python-version: 3.11  
+      - name: cache for faster plan workflow
+        uses: actions/cache@v4
+        with:
+          path: ./cache
+          key: ${{github.ref_name}}-terraform-${{github.sha}}
+          restore-keys: -terraform-${{github.sha}}
+      - name: setup terraform 
+        uses: hashicorp/setup-terraform@v3 
+        with:
+          terraform_version: 1.5.7 
+      - name: login to aws 
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{secrets.ROLE}}
+          aws-region: ${{secrets.REGION}}
+      - name: terraform init 
+        run: | 
+          cd $GITHUB_WORKSPACE/environment/development 
+          terraform init -no-color 
+      - name: terraform format 
+        run: | 
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform fmt -recursive -check 
+      - name: terraform validate 
+        run: | 
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform validate -no-color 
+      - name: terraform linting 
+        run: | 
+          curl -ls https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          tflint --format=json  -out tflint.json || true 
+      - name: terraform tfsec 
+        run: | 
+          curl -sSL https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh  -o tfsec
+          chmod +x tfsec
+          sudo mv tfsec /usr/local/bin
+      - name: run security 
+        run: | 
+          cd $GITHUB_WORKSPACE/environment/development
+          tfsec --format=json --out=tfsec.json || true 
+      - name: run terraform checkov
+        run: |
+          pip install checkov 
+          cd $GITHUB_WORKSPACE/environment/development 
+          checkov -d . -o json > check-report.json || true 
+      - name: terraform plan 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development 
+          Environment="${{github.ref_name}}"
+          terraform workspace select -or-create $Environment
+          terraform plan -input=false -out=tfplan 
+          terraform show -json tfplan > tfplan.json
+      - name: check file let know what is in the runner
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development 
+          ls -la 
+      - name: pull_request comment 
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: pr_comment.md 
+          header: "terraform (automatic -c)-comment"
+          recreate: true 
+      - name: terraform apply 
+        run: |
+          cd $GITHUB_WORKSPACE/environment/development
+          terraform apply --auto-approve -input=false tfplan
+          terraform destroy --auto-approve 
+
